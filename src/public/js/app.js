@@ -6,6 +6,4 @@ socket.addEventListener("message", () => console.log("Connected to the Server âœ
 socket.addEventListener("message", (message) => console.log(`New Message: ${message.data}`))
 socket.addEventListener("close", () => console.log("Disconnected to the Server ðŸ˜´"))
 
-setTimeout(()=>{
-    socket.send("Hello from the browser!")
-}, TIME_DELAY)
+setTimeout(()=>socket.send("Hello from the browser!"), TIME_DELAY)
