@@ -6,7 +6,11 @@ const messageList = document.getElementById("message-list")
 const messageForm = document.getElementById("message-form")
 
 socket.addEventListener("open", () => console.log("Connected to the Server ✅"))
-socket.addEventListener("message", (message) => console.log(`New Message: ${message.data}`))
+socket.addEventListener("message", (message) => {
+    const li = document.createElement("li")
+    li.innerText = message.data
+    messageList.append(li)
+})
 socket.addEventListener("close", () => console.log("Disconnected to the Server 😴"))
 
 const handleSubmit = (event) => {
@@ -17,5 +21,3 @@ const handleSubmit = (event) => {
 }
 
 messageForm.addEventListener("submit", handleSubmit)
-
-setTimeout(()=>socket.send("Hello from the browser!"), TIME_DELAY)
