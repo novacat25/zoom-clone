@@ -8,15 +8,17 @@ const messageList = document.getElementById("message-list")
 const messageForm = document.getElementById("message-form")
 const nicknameForm = document.getElementById("nickname-form")
 
-socket.addEventListener("open", () => console.log("Connected to the Server ✅"))
-socket.addEventListener("message", (message) => {
-    const li = document.createElement("li")
-    li.innerText = message.data
-    messageList.append(li)
-})
-socket.addEventListener("close", () => console.log("Disconnected to the Server 😴"))
 
 const makeMessage = (type, payload) => JSON.stringify({type, payload})
+const renderMessage = (textValue) => {
+    const li = document.createElement("li")
+    li.innerText = textValue
+    messageList.append(li)
+}
+
+socket.addEventListener("open", () => console.log("Connected to the Server ✅"))
+socket.addEventListener("message", (message) => renderMessage(message.data))
+socket.addEventListener("close", () => console.log("Disconnected to the Server 😴"))
 
 const handleSubmit = (event) => {
     event.preventDefault()
