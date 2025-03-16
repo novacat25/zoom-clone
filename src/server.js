@@ -4,6 +4,9 @@ import express from "express"
 
 const app = express()
 const PORT_NUMBER = 3000
+const DEFAULT_ANONYMOUS_NAME = "Anonymous"
+const TYPE_NICKNAME = "nickname"
+const TYPE_NEW_MESSAGE = "new_message"
 
 app.set("view engine", "pug")
 app.set("views", __dirname + "/views")
@@ -20,10 +23,19 @@ const sockets = []
 
 wss.on("connection", (socket) => {
     sockets.push(socket)
+    socket["nickname"] = DEFAULT_ANONYMOUS_NAME
     console.log("Connected to the Browser ✅")
     socket.on("close", ()=>console.log("Disconnected from the Broswer 😴"))
-    socket.on("message", (message) => {
-        sockets.forEach(aSocket => aSocket.send(message.toString("utf8")))
+    socket.on("message", (msg) => {
+        const message = JSON.parse(msg)
+        switch (message.type) {
+            case TYPE_NEW_MESSAGE:
+                sockets.forEach(aSocket => aSocket.send(`${socket.nickname}: ${message.payload}`))
+                break
+            case TYPE_NICKNAME:
+                socket["nickname"] = message.payload
+                break
+        }
     })
 })
 server.listen(PORT_NUMBER, handleListen)
