@@ -19,7 +19,6 @@ const wss = new WebSocket.Server({ server })
 wss.on("connection", (socket) => {
     console.log("Connected to the Browser ✅")
     socket.on("close", ()=>console.log("Disconnected from the Broswer 😴"))
-    socket.on("message", (message) => console.log(message.toString("utf8")))
-    socket.send("OiiaOiia", console.error)
+    socket.on("message", (message) => socket.send(message.toString("utf8")))
 })
 server.listen(PORT_NUMBER, handleListen)
