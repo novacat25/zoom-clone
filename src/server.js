@@ -16,4 +16,9 @@ const handleListen = () => console.log(`Listening on http://localhost:${PORT_NUM
 const server = http.createServer(app)
 const wss = new WebSocket.Server({ server })
 
+const handleConnection = (socket) => {
+    console.log(socket)
+}
+
+wss.on("connection", handleConnection)
 server.listen(PORT_NUMBER, handleListen)
