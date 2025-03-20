@@ -6,17 +6,11 @@ html(lang="en")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         title Noom
         link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+        script(defer, src="/socket.io/socket.io.js") 
         script(defer, src="/public/js/app.js") 
     body
         header
             h1 Noom
         main
             h2 Welcome to Noom
-            form#nickname-form
-                input(type="text", placeholder="Choose your nickname.", id="nickname-input", required)
-                button Enter            
-            ul(id="message-list")
-            form#message-form
-                input(type="text", placeholder="Write a message.", id="message-input", required)
-                button Send 
         
