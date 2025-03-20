@@ -19,8 +19,12 @@ const httpServer = http.createServer(app)
 const io = new Server(httpServer)
 
 io.on("connection", (socket) => {
+    socket.onAny((event) => console.log(`Socket Event: ${event}`) )
     socket.on("enter-room", (roomName, jobDone) => {
-        console.log(roomName)
+        console.log("socket.id", socket.id)
+        console.log(socket.rooms)
+        socket.join(roomName)
+        console.log(socket.rooms)
         setTimeout(()=>jobDone(JOBDONE_MESSAGE), ANONYMOUS_SECOND)
     })
 })
