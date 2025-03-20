@@ -4,6 +4,8 @@ import express from "express"
 
 const app = express()
 const PORT_NUMBER = 3000
+const DEFAULT_ROOM = "room1"
+const ANONYMOUS_SECOND = 2000
 
 app.set("view engine", "pug")
 app.set("views", __dirname + "/views")
@@ -16,5 +18,11 @@ const handleListen = () => console.log(`Listening on http://localhost:${PORT_NUM
 const httpServer = http.createServer(app)
 const io = new Server(httpServer)
 
-io.on("connection", (socket) => console.log(socket))
+io.on("connection", (socket) => {
+    socket.on("enter-room", (msg, done) => {
+        console.log(msg)
+        setTimeout(() => done(), ANONYMOUS_SECOND)
+    })
+})
+
 httpServer.listen(PORT_NUMBER, handleListen)
