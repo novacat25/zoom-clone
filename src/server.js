@@ -4,8 +4,6 @@ import express from "express"
 
 const app = express()
 const PORT_NUMBER = 3000
-const ANONYMOUS_SECOND = 2000
-const JOBDONE_MESSAGE = "Hello From the Backend"
 
 app.set("view engine", "pug")
 app.set("views", __dirname + "/views")
@@ -19,9 +17,10 @@ const httpServer = http.createServer(app)
 const io = new Server(httpServer)
 
 io.on("connection", (socket) => {
+    socket.onAny((event) => console.log(`Socket Event: ${event}`) )
     socket.on("enter-room", (roomName, jobDone) => {
-        console.log(roomName)
-        setTimeout(()=>jobDone(JOBDONE_MESSAGE), ANONYMOUS_SECOND)
+        socket.join(roomName)
+        jobDone()
     })
 })
 

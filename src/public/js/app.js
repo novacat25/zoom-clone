@@ -2,15 +2,22 @@ const socket = io()
 
 const welcomeSection = document.getElementById("welcome")
 const roomNameForm = document.getElementById("room-name")
+const roomSection = document.getElementById("room")
 
-const noticeBackendDone = (msg) => {
-    console.log(`The backend says: ${msg}`)
+let roomName = ""
+
+const showRoom = () => {
+    welcomeSection.hidden = true
+    roomSection.hidden = false
+    const roomTitle = document.getElementById("room-title")
+    roomTitle.innerText = roomName
 }
 
 const handleRoomSubmit = (e) => {
     e.preventDefault()
     const roomInput = document.getElementById("room-input")
-    socket.emit("enter-room", roomInput.value, noticeBackendDone)
+    roomName = roomInput.value
+    socket.emit("enter-room", roomInput.value, showRoom)
     roomInput.value = ""
 }
 
