@@ -20,6 +20,7 @@ io.on("connection", (socket) => {
     socket.onAny((event) => console.log(`Socket Event: ${event}`) )
     socket.on("enter-room", (roomName, jobDone) => {
         socket.join(roomName)
+        socket.to(roomName).emit("welcome-everyone")
         jobDone()
     })
 })

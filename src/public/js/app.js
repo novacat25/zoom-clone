@@ -13,12 +13,20 @@ const showRoom = () => {
     roomTitle.innerText = roomName
 }
 
+const addMessage = (msg) => {
+    const dialogLost = document.getElementById("dialog-list")
+    const chatItem = document.createElement("li")
+    chatItem.innerText = msg
+    dialogLost.appendChild(chatItem)
+}
+
 const handleRoomSubmit = (e) => {
     e.preventDefault()
     const roomInput = document.getElementById("room-input")
     roomName = roomInput.value
     socket.emit("enter-room", roomInput.value, showRoom)
     roomInput.value = ""
+    socket.on("welcome-everyone", () => addMessage("Someone has joined!"))
 }
 
 roomNameForm.addEventListener("submit", handleRoomSubmit)
