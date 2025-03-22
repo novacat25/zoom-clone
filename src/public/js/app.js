@@ -26,7 +26,9 @@ const handleRoomSubmit = (e) => {
     roomName = roomInput.value
     socket.emit("enter-room", roomInput.value, showRoom)
     roomInput.value = ""
-    socket.on("welcome-everyone", () => addMessage("Someone has joined!"))
 }
+
+socket.on("welcome-everyone", () => addMessage("Someone has joined!"))
+socket.on("left-room", () => addMessage("Someone has left!")) 
 
 roomNameForm.addEventListener("submit", handleRoomSubmit)

@@ -23,6 +23,9 @@ io.on("connection", (socket) => {
         socket.to(roomName).emit("welcome-everyone")
         jobDone()
     })
+    socket.on("disconnecting", ()=>{
+        socket.rooms.forEach((room) => socket.to(room).emit("left-room"))
+    })
 })
 
 httpServer.listen(PORT_NUMBER, handleListen)
