@@ -23,6 +23,10 @@ io.on("connection", (socket) => {
         socket.to(roomName).emit("welcome-everyone")
         jobDone()
     })
+    socket.on("send-message", (msg, chatRoom, jobDone) => {
+        socket.to(chatRoom).emit("show-message", msg)
+        jobDone()
+    })
     socket.on("disconnecting", ()=>{
         socket.rooms.forEach((room) => socket.to(room).emit("left-room"))
     })

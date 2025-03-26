@@ -11,6 +11,9 @@ const showRoom = () => {
     roomSection.hidden = false
     const roomTitle = document.getElementById("room-title")
     roomTitle.innerText = roomName
+
+    const chatForm = document.getElementById("chat-form")
+    chatForm.addEventListener("submit", handleMessageSubmit)
 }
 
 const addMessage = (msg) => {
@@ -20,6 +23,7 @@ const addMessage = (msg) => {
     dialogLost.appendChild(chatItem)
 }
 
+
 const handleRoomSubmit = (e) => {
     e.preventDefault()
     const roomInput = document.getElementById("room-input")
@@ -28,7 +32,20 @@ const handleRoomSubmit = (e) => {
     roomInput.value = ""
 }
 
+const handleMessageSubmit = (e) => {
+    e.preventDefault()
+    const messageInput = document.getElementById("message-input")
+    const messageInputValue = messageInput.value
+    socket.emit("send-message", messageInputValue, roomName, () => {
+        addMessage(`You: ${messageInputValue}`)
+        console.log("b")
+    })
+    messageInput.value = ""
+    console.log("c")
+}
+
 socket.on("welcome-everyone", () => addMessage("Someone has joined!"))
 socket.on("left-room", () => addMessage("Someone has left!")) 
+socket.on("show-message", addMessage)
 
 roomNameForm.addEventListener("submit", handleRoomSubmit)
