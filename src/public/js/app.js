@@ -38,10 +38,8 @@ const handleMessageSubmit = (e) => {
     const messageInputValue = messageInput.value
     socket.emit("send-message", messageInputValue, roomName, () => {
         addMessage(`You: ${messageInputValue}`)
-        console.log("b")
     })
     messageInput.value = ""
-    console.log("c")
 }
 
 socket.on("welcome-everyone", () => addMessage("Someone has joined!"))
