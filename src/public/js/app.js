@@ -6,7 +6,6 @@ const roomSection = document.getElementById("room")
 const nicknameForm = document.getElementById("nickname-form")
 const DEFAULT_NICKNAME = "Anonymous"
 
-let isUserSetNickname = false
 const isAnonymousUser = (userNickname) => (userNickname === DEFAULT_NICKNAME)
 
 const addMessage = (msg) => {
@@ -18,7 +17,6 @@ const addMessage = (msg) => {
 
 const handleNicknameSubmit = (e) => {
     e.preventDefault()
-    isUserSetNickname = true
     const nicknameInput = document.getElementById("nickname-input")
     const userNicknameDisplay = document.getElementById("username-display")
     const userNickName = nicknameInput.value
@@ -31,10 +29,6 @@ const handleNicknameSubmit = (e) => {
 
 const handleRoomSubmit = (e) => {
     e.preventDefault()
-    if(!isUserSetNickname) {
-        alert("Please choose a nickname!")
-        return
-    }
     const roomInput = document.getElementById("room-input")
     roomName = roomInput.value
     socket.emit("enter-room", roomInput.value, showRoom)
