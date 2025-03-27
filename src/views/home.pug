@@ -14,13 +14,18 @@ html(lang="en")
             h1 Noom
         main
             h2 Welcome to Noom
+            h3(id="username-display", hidden)
+            section
+                form#nickname-form
+                    input(id="nickname-input", placeholder="Choose your nickname!", required, type="text")
+                    button Choose
             section#welcome
                 form#room-name
                     input(id="room-input", placeholder="room name", required, type="text")
                     button Enter Room
             section(id="room", hidden)
-                h3#room-title
-                ul#dialog-list
+                h2#room-title
+                ul#dialog-list                      
                 form#chat-form
                     input(id="message-input", placeholder="Send a message!", required, type="text")
                     button Send

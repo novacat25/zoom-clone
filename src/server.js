@@ -4,6 +4,7 @@ import express from "express"
 
 const app = express()
 const PORT_NUMBER = 3000
+const DEFAULT_NICKNAME = "Anonymous"
 
 app.set("view engine", "pug")
 app.set("views", __dirname + "/views")
@@ -17,18 +18,19 @@ const httpServer = http.createServer(app)
 const io = new Server(httpServer)
 
 io.on("connection", (socket) => {
-    socket.onAny((event) => console.log(`Socket Event: ${event}`) )
+    socket["nickname"] = DEFAULT_NICKNAME
     socket.on("enter-room", (roomName, jobDone) => {
         socket.join(roomName)
-        socket.to(roomName).emit("welcome-everyone")
+        socket.to(roomName).emit("welcome-everyone", socket.nickname)
         jobDone()
     })
+    socket.on("choose-nickname", (nick) => socket["nickname"] = nick)
     socket.on("send-message", (msg, chatRoom, jobDone) => {
-        socket.to(chatRoom).emit("show-message", msg)
+        socket.to(chatRoom).emit("show-message", `${socket.nickname}: ${msg}`)
         jobDone()
     })
     socket.on("disconnecting", ()=>{
-        socket.rooms.forEach((room) => socket.to(room).emit("left-room"))
+        socket.rooms.forEach((room) => socket.to(room).emit("left-room", socket.nickname))
     })
 })
 
