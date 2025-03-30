@@ -5,6 +5,7 @@ const roomNameForm = document.getElementById("room-name")
 const roomSection = document.getElementById("room")
 const nicknameForm = document.getElementById("nickname-form")
 const DEFAULT_NICKNAME = "Anonymous"
+const DEFAULT_DISPLAY_NICKNAME = "Someone"
 
 const isAnonymousUser = (userNickname) => (userNickname === DEFAULT_NICKNAME)
 
@@ -57,10 +58,12 @@ const showRoom = () => {
 }
 
 socket.on("welcome-everyone", (user) => {
-    isAnonymousUser(user) ? addMessage(`Someone has joined!`) : addMessage(`${user} has joined!`)
+    const displayUserName = isAnonymousUser(user) ? DEFAULT_DISPLAY_NICKNAME : user
+    addMessage(`${displayUserName} has joined!`)
 })
 socket.on("left-room", (user) => {
-    isAnonymousUser(user) ? addMessage(`Someone has left!`) : addMessage(`${user} has left!`)
+    const displayUserName = isAnonymousUser(user) ? DEFAULT_DISPLAY_NICKNAME : user
+    addMessage(`${displayUserName} has left!`)
 }) 
 socket.on("show-message", addMessage)
 
