@@ -53,6 +53,8 @@ io.on("connection", (socket) => {
     })
     socket.on("disconnecting", ()=>{
         socket.rooms.forEach((room) => socket.to(room).emit("left-room", socket.nickname))
+    })
+    socket.on("disconnect", () => {
         io.sockets.emit("room-change", publicRooms())
     })
 })
