@@ -17,11 +17,33 @@ const handleListen = () => console.log(`Listening on http://localhost:${PORT_NUM
 const httpServer = http.createServer(app)
 const io = new Server(httpServer)
 
+const publicRooms = () => {
+    const {
+        sockets: {
+            adapter: { sids, rooms },
+        },
+    } = io
+
+    const publicRoomsList = []
+    rooms.forEach((_, key) => {
+        if(!sids.get(key)) {
+            publicRoomsList.push(key)
+        }
+    })
+
+    return publicRoomsList
+}
+
 io.on("connection", (socket) => {
     socket["nickname"] = DEFAULT_NICKNAME
+    socket.onAny((event) => {
+        console.log(io.sockets.adapter)
+        console.log(`Socket Event: ${event}`)
+    })
     socket.on("enter-room", (roomName, jobDone) => {
         socket.join(roomName)
         socket.to(roomName).emit("welcome-everyone", socket.nickname)
+        io.sockets.emit("room-change", publicRooms())
         jobDone()
     })
     socket.on("choose-nickname", (nick) => socket["nickname"] = nick)
@@ -31,6 +53,7 @@ io.on("connection", (socket) => {
     })
     socket.on("disconnecting", ()=>{
         socket.rooms.forEach((room) => socket.to(room).emit("left-room", socket.nickname))
+        io.sockets.emit("room-change", publicRooms())
     })
 })
 
