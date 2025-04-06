@@ -47,23 +47,28 @@ const handleMessageSubmit = (e) => {
     messageInput.value = ""
 }
 
-const showRoom = () => {
+const refreshRoomName = (roomText) => {
+    const roomTitle = document.getElementById("room-title")
+    roomTitle.innerText = `Room: ${roomText}`
+}
+
+const showRoom = (newCount) => {
     welcomeSection.hidden = true
     roomSection.hidden = false
-    const roomTitle = document.getElementById("room-title")
-    roomTitle.innerText = `Room: ${roomName}`
+    refreshRoomName(`${roomName} (${newCount})`)
 
     const chatForm = document.getElementById("chat-form")
-
     chatForm.addEventListener("submit", handleMessageSubmit)
 }
 
-socket.on("welcome-everyone", (user) => {
+socket.on("welcome-everyone", (user, newCount) => {
     const displayUserName = isAnonymousUser(user) ? DEFAULT_DISPLAY_NICKNAME : user
+    refreshRoomName(`${roomName} (${newCount})`)
     addMessage(`${displayUserName} has joined!`)
 })
-socket.on("left-room", (user) => {
+socket.on("left-room", (user, newCount) => {
     const displayUserName = isAnonymousUser(user) ? DEFAULT_DISPLAY_NICKNAME : user
+    refreshRoomName(`${roomName} (${newCount})`)
     addMessage(`${displayUserName} has left!`)
 }) 
 socket.on("room-change", (rooms) => {

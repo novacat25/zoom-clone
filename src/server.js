@@ -34,6 +34,9 @@ const publicRooms = () => {
     return publicRoomsList
 }
 
+const countRoom = (roomName) => io.sockets.adapter.rooms.get(roomName)?.size
+
+
 io.on("connection", (socket) => {
     socket["nickname"] = DEFAULT_NICKNAME
     socket.onAny((event) => {
@@ -42,9 +45,9 @@ io.on("connection", (socket) => {
     })
     socket.on("enter-room", (roomName, jobDone) => {
         socket.join(roomName)
-        socket.to(roomName).emit("welcome-everyone", socket.nickname)
+        socket.to(roomName).emit("welcome-everyone", socket.nickname, countRoom(roomName))
         io.sockets.emit("room-change", publicRooms())
-        jobDone()
+        jobDone(countRoom(roomName))
     })
     socket.on("choose-nickname", (nick) => socket["nickname"] = nick)
     socket.on("send-message", (msg, chatRoom, jobDone) => {
@@ -52,7 +55,7 @@ io.on("connection", (socket) => {
         jobDone()
     })
     socket.on("disconnecting", ()=>{
-        socket.rooms.forEach((room) => socket.to(room).emit("left-room", socket.nickname))
+        socket.rooms.forEach((room) => socket.to(room).emit("left-room", socket.nickname, countRoom(room) - 1))
     })
     socket.on("disconnect", () => {
         io.sockets.emit("room-change", publicRooms())
