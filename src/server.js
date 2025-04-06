@@ -39,10 +39,6 @@ const countRoom = (roomName) => io.sockets.adapter.rooms.get(roomName)?.size
 
 io.on("connection", (socket) => {
     socket["nickname"] = DEFAULT_NICKNAME
-    socket.onAny((event) => {
-        console.log(io.sockets.adapter)
-        console.log(`Socket Event: ${event}`)
-    })
     socket.on("enter-room", (roomName, jobDone) => {
         socket.join(roomName)
         socket.to(roomName).emit("welcome-everyone", socket.nickname, countRoom(roomName))
