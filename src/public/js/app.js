@@ -65,6 +65,8 @@ socket.on("left-room", (user) => {
     const displayUserName = isAnonymousUser(user) ? DEFAULT_DISPLAY_NICKNAME : user
     addMessage(`${displayUserName} has left!`)
 }) 
+socket.on("room-change", console.log) 
+
 socket.on("show-message", addMessage)
 
 nicknameForm.addEventListener("submit", handleNicknameSubmit)
