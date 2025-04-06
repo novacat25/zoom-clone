@@ -4,16 +4,17 @@ const welcomeSection = document.getElementById("welcome")
 const roomNameForm = document.getElementById("room-name")
 const roomSection = document.getElementById("room")
 const nicknameForm = document.getElementById("nickname-form")
+
 const DEFAULT_NICKNAME = "Anonymous"
 const DEFAULT_DISPLAY_NICKNAME = "Someone"
 
 const isAnonymousUser = (userNickname) => (userNickname === DEFAULT_NICKNAME)
 
 const addMessage = (msg) => {
-    const dialogLost = document.getElementById("dialog-list")
+    const dialogList = document.getElementById("dialog-list")
     const chatItem = document.createElement("li")
     chatItem.innerText = msg
-    dialogLost.appendChild(chatItem)
+    dialogList.appendChild(chatItem)
 }
 
 const handleNicknameSubmit = (e) => {
@@ -65,7 +66,20 @@ socket.on("left-room", (user) => {
     const displayUserName = isAnonymousUser(user) ? DEFAULT_DISPLAY_NICKNAME : user
     addMessage(`${displayUserName} has left!`)
 }) 
-socket.on("room-change", console.log) 
+socket.on("room-change", (rooms) => {
+    const roomsList = document.getElementById("rooms-list")
+    roomsList.innerHTML = ""
+
+    if(rooms.length === 0) {
+        return
+    }
+
+    rooms.forEach((room) => {
+        const roomItem = document.createElement("li")
+        roomItem.innerText = room
+        roomsList.appendChild(roomItem)
+    })
+}) 
 
 socket.on("show-message", addMessage)
 
