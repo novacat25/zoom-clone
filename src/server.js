@@ -1,6 +1,8 @@
 import http from "http"
 import { Server } from "socket.io"
 import express from "express"
+import { instrument } from "@socket.io/admin-ui"
+import 'dotenv/config'
 
 const app = express()
 const PORT_NUMBER = 3000
@@ -15,7 +17,19 @@ app.get("/*", (_,res) => res.redirect("/"))
 const handleListen = () => console.log(`Listening on http://localhost:${PORT_NUMBER}`)
 
 const httpServer = http.createServer(app)
-const io = new Server(httpServer)
+const io = new Server(httpServer, {
+    cors: {
+        origin: ["https://admin.socket.io"],
+        credentials: true
+    }
+})
+instrument(io, {
+    auth:  {
+        type: "basic",
+        username: process.env.ADMIN_USERNAME,
+        password: process.env.ADMIN_PASSWORD
+      }
+})
 
 const publicRooms = () => {
     const {
