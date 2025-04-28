@@ -13,6 +13,7 @@ const getMedia = async () => {
             video: true
         })
         myFace.srcObject = myStream
+        console.log(myStream)
 
     } catch (err) {
         console.error(err)
@@ -20,6 +21,10 @@ const getMedia = async () => {
 }
 
 const handleMuteClick = () => {
+    myStream
+        .getAudioTracks()
+        .forEach((track) => (track.enabled = !track.enabled))
+
     if (!muted) {
         muted = true
         muteButton.innerText = "Unmute"
@@ -30,6 +35,10 @@ const handleMuteClick = () => {
 }
 
 const handleCameraClick = () => {
+    myStream
+    .getVideoTracks()
+    .forEach((track) => (track.enabled = !track.enabled))
+
     if (!cameraOff) {
         cameraOff = true
         cameraButton.innerText = "Camera On"
