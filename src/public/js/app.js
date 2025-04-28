@@ -1,92 +1,45 @@
 const socket = io()
+const myFace = document.getElementById("my-face")
+const muteButton = document.getElementById("mute")
+const cameraButton = document.getElementById("camera")
 
-const welcomeSection = document.getElementById("welcome")
-const roomNameForm = document.getElementById("room-name")
-const roomSection = document.getElementById("room")
-const nicknameForm = document.getElementById("nickname-form")
+let myStream = null
+let [muted, cameraOff] = [false, false]
 
-const DEFAULT_NICKNAME = "Anonymous"
-const DEFAULT_DISPLAY_NICKNAME = "Someone"
+const getMedia = async () => {
+    try {
+        myStream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: true
+        })
+        myFace.srcObject = myStream
 
-const isAnonymousUser = (userNickname) => (userNickname === DEFAULT_NICKNAME)
-
-const addMessage = (msg) => {
-    const dialogList = document.getElementById("dialog-list")
-    const chatItem = document.createElement("li")
-    chatItem.innerText = msg
-    dialogList.appendChild(chatItem)
-}
-
-const handleNicknameSubmit = (e) => {
-    e.preventDefault()
-    const nicknameInput = document.getElementById("nickname-input")
-    const userNicknameDisplay = document.getElementById("username-display")
-    const userNickName = nicknameInput.value
-    socket.emit("choose-nickname", userNickName)
-    nicknameForm.hidden = true
-    userNicknameDisplay.innerText = ` Hello ${userNickName}!`
-    userNicknameDisplay.hidden = false
-    nicknameInput.value = ""
-}
-
-const handleRoomSubmit = (e) => {
-    e.preventDefault()
-    const roomInput = document.getElementById("room-input")
-    roomName = roomInput.value
-    socket.emit("enter-room", roomInput.value, showRoom)
-    roomInput.value = ""
-}
-
-const handleMessageSubmit = (e) => {
-    e.preventDefault()
-    const messageInput = document.getElementById("message-input")
-    const messageInputValue = messageInput.value
-    socket.emit("send-message", messageInputValue, roomName, () => {
-        addMessage(`You: ${messageInputValue}`)
-    })
-    messageInput.value = ""
-}
-
-const refreshRoomName = (roomText) => {
-    const roomTitle = document.getElementById("room-title")
-    roomTitle.innerText = `Room: ${roomText}`
-}
-
-const showRoom = (newCount) => {
-    welcomeSection.hidden = true
-    roomSection.hidden = false
-    refreshRoomName(`${roomName} (${newCount})`)
-
-    const chatForm = document.getElementById("chat-form")
-    chatForm.addEventListener("submit", handleMessageSubmit)
-}
-
-socket.on("welcome-everyone", (user, newCount) => {
-    const displayUserName = isAnonymousUser(user) ? DEFAULT_DISPLAY_NICKNAME : user
-    refreshRoomName(`${roomName} (${newCount})`)
-    addMessage(`${displayUserName} has joined!`)
-})
-socket.on("left-room", (user, newCount) => {
-    const displayUserName = isAnonymousUser(user) ? DEFAULT_DISPLAY_NICKNAME : user
-    refreshRoomName(`${roomName} (${newCount})`)
-    addMessage(`${displayUserName} has left!`)
-}) 
-socket.on("room-change", (rooms) => {
-    const roomsList = document.getElementById("rooms-list")
-    roomsList.innerHTML = ""
-
-    if(rooms.length === 0) {
-        return
+    } catch (err) {
+        console.error(err)
     }
+}
 
-    rooms.forEach((room) => {
-        const roomItem = document.createElement("li")
-        roomItem.innerText = room
-        roomsList.appendChild(roomItem)
-    })
-}) 
+const handleMuteClick = () => {
+    if (!muted) {
+        muted = true
+        muteButton.innerText = "Unmute"
+    } else {
+        muted = false
+        muteButton.innerText = "Mute"
+    }
+}
 
-socket.on("show-message", addMessage)
+const handleCameraClick = () => {
+    if (!cameraOff) {
+        cameraOff = true
+        cameraButton.innerText = "Camera On"
+    } else {
+        cameraOff = false
+        cameraButton.innerText = "Camera Off"
+    }
+}
 
-nicknameForm.addEventListener("submit", handleNicknameSubmit)
-roomNameForm.addEventListener("submit", handleRoomSubmit)
+getMedia()
+
+muteButton.addEventListener("click", handleMuteClick)
+cameraButton.addEventListener("click", handleCameraClick)
