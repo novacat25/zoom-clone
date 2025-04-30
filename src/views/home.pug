@@ -13,23 +13,8 @@ html(lang="en")
         header
             h1 Noom
         main
-            h2 Welcome to Noom
-            h3(id="username-display", hidden)
-            section
-                form#nickname-form
-                    input(id="nickname-input", placeholder="Choose your nickname!", required, type="text")
-                    button Choose
-            section#welcome
-                form#room-name
-                    input(id="room-input", placeholder="room name", required, type="text")
-                    button Enter Room
-            section(id="room", hidden)
-                h2#room-title
-                ul#dialog-list                      
-                form#chat-form
-                    input(id="message-input", placeholder="Send a message!", required, type="text")
-                    button Send
-            section
-                h4 Open Rooms:
-                ul#rooms-list
-        
+            section#my-stream
+               video#my-face(autoplay, playsinline, width="400", height="400")
+               button(id="mute", class="zoom-button") Mute
+               button(id="camera", class="zoom-button") Camera Off
+               select(id="camera-select")

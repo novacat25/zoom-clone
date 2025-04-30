@@ -1,92 +1,98 @@
 const socket = io()
 
-const welcomeSection = document.getElementById("welcome")
-const roomNameForm = document.getElementById("room-name")
-const roomSection = document.getElementById("room")
-const nicknameForm = document.getElementById("nickname-form")
+const myFace = document.getElementById("my-face")
+const muteButton = document.getElementById("mute")
+const cameraButton = document.getElementById("camera")
+const cameraSelect = document.getElementById("camera-select")
 
-const DEFAULT_NICKNAME = "Anonymous"
-const DEFAULT_DISPLAY_NICKNAME = "Someone"
+const CAMERA_INPUT_TYPE = "videoinput"
 
-const isAnonymousUser = (userNickname) => (userNickname === DEFAULT_NICKNAME)
+let myStream = null
+let [muted, cameraOff] = [false, false]
 
-const addMessage = (msg) => {
-    const dialogList = document.getElementById("dialog-list")
-    const chatItem = document.createElement("li")
-    chatItem.innerText = msg
-    dialogList.appendChild(chatItem)
-}
+const getCameras = async () => {
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices()
+        const cameras = devices.filter((device) => device.kind === CAMERA_INPUT_TYPE)
+        const currentCamera = myStream.getVideoTracks()[0]
 
-const handleNicknameSubmit = (e) => {
-    e.preventDefault()
-    const nicknameInput = document.getElementById("nickname-input")
-    const userNicknameDisplay = document.getElementById("username-display")
-    const userNickName = nicknameInput.value
-    socket.emit("choose-nickname", userNickName)
-    nicknameForm.hidden = true
-    userNicknameDisplay.innerText = ` Hello ${userNickName}!`
-    userNicknameDisplay.hidden = false
-    nicknameInput.value = ""
-}
+        cameras.forEach((camera) => {
+            const option = document.createElement("option")
+            option.innerText = camera.label
+            option.value = camera.deviceId
+            if(camera.label === currentCamera.label) {
+                option.selected = true
+            }
+            cameraSelect.appendChild(option)
+        })
 
-const handleRoomSubmit = (e) => {
-    e.preventDefault()
-    const roomInput = document.getElementById("room-input")
-    roomName = roomInput.value
-    socket.emit("enter-room", roomInput.value, showRoom)
-    roomInput.value = ""
-}
-
-const handleMessageSubmit = (e) => {
-    e.preventDefault()
-    const messageInput = document.getElementById("message-input")
-    const messageInputValue = messageInput.value
-    socket.emit("send-message", messageInputValue, roomName, () => {
-        addMessage(`You: ${messageInputValue}`)
-    })
-    messageInput.value = ""
-}
-
-const refreshRoomName = (roomText) => {
-    const roomTitle = document.getElementById("room-title")
-    roomTitle.innerText = `Room: ${roomText}`
-}
-
-const showRoom = (newCount) => {
-    welcomeSection.hidden = true
-    roomSection.hidden = false
-    refreshRoomName(`${roomName} (${newCount})`)
-
-    const chatForm = document.getElementById("chat-form")
-    chatForm.addEventListener("submit", handleMessageSubmit)
-}
-
-socket.on("welcome-everyone", (user, newCount) => {
-    const displayUserName = isAnonymousUser(user) ? DEFAULT_DISPLAY_NICKNAME : user
-    refreshRoomName(`${roomName} (${newCount})`)
-    addMessage(`${displayUserName} has joined!`)
-})
-socket.on("left-room", (user, newCount) => {
-    const displayUserName = isAnonymousUser(user) ? DEFAULT_DISPLAY_NICKNAME : user
-    refreshRoomName(`${roomName} (${newCount})`)
-    addMessage(`${displayUserName} has left!`)
-}) 
-socket.on("room-change", (rooms) => {
-    const roomsList = document.getElementById("rooms-list")
-    roomsList.innerHTML = ""
-
-    if(rooms.length === 0) {
-        return
+    } catch (err) {
+        console.error(err)
     }
 
-    rooms.forEach((room) => {
-        const roomItem = document.createElement("li")
-        roomItem.innerText = room
-        roomsList.appendChild(roomItem)
-    })
-}) 
+}
+const getMedia = async (deviceId) => {
+    const initialConstraints = {
+        audio: true,
+        video: {
+            facingMode: "user"
+        }
+    }
+    const cameraConstraints = {
+        audio: true,
+        video: {
+            deviceId: deviceId
+        }
+    }
+    try {
+        myStream = await navigator.mediaDevices.getUserMedia(
+            deviceId ? cameraConstraints : initialConstraints
+        )
+        myFace.srcObject = myStream
 
-socket.on("show-message", addMessage)
+        if(!deviceId) {
+            await getCameras()
+        }
 
-nicknameForm.addEventListener("submit", handleNicknameSubmit)
-roomNameForm.addEventListener("submit", handleRoomSubmit)
+    } catch (err) {
+        console.error(err)
+    }
+}
+
+const handleCameraChange = async () => {
+    await getMedia(cameraSelect.value)
+}
+
+const handleMuteClick = () => {
+    myStream
+        .getAudioTracks()
+        .forEach((track) => (track.enabled = !track.enabled))
+
+    if (!muted) {
+        muted = true
+        muteButton.innerText = "Unmute"
+    } else {
+        muted = false
+        muteButton.innerText = "Mute"
+    }
+}
+
+const handleCameraClick = () => {
+    myStream
+    .getVideoTracks()
+    .forEach((track) => (track.enabled = !track.enabled))
+
+    if (!cameraOff) {
+        cameraOff = true
+        cameraButton.innerText = "Camera On"
+    } else {
+        cameraOff = false
+        cameraButton.innerText = "Camera Off"
+    }
+}
+
+getMedia()
+
+muteButton.addEventListener("click", handleMuteClick)
+cameraButton.addEventListener("click", handleCameraClick)
+cameraSelect.addEventListener("input", handleCameraChange)
