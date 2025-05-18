@@ -9,6 +9,7 @@ const CAMERA_INPUT_TYPE = "videoinput"
 
 let myStream = null
 let [muted, cameraOff] = [false, false]
+let roomName
 
 const getCameras = async () => {
     try {
@@ -91,8 +92,36 @@ const handleCameraClick = () => {
     }
 }
 
-getMedia()
-
 muteButton.addEventListener("click", handleMuteClick)
 cameraButton.addEventListener("click", handleCameraClick)
 cameraSelect.addEventListener("input", handleCameraChange)
+
+// Welcome Form (join room)
+const welcome = document.getElementById("welcome")
+const call = document.getElementById("call")
+const enterRoom = document.getElementById("enter-room")
+
+
+const startMedia = () => {
+    welcome.hidden = true
+    call.hidden = false
+    getMedia()
+}
+
+const handleEnterRoom = (e) => {
+    e.preventDefault()
+    const input = document.getElementById("room-title")
+    socket.emit("join-room", input.value, startMedia)
+    roomName = input.value
+    input.value = ""
+}
+
+call.hidden = true
+
+enterRoom.addEventListener("submit", handleEnterRoom)
+
+// Socket code
+
+socket.on("welcome", () => {
+    console.log("Somebody has joined!")
+})
